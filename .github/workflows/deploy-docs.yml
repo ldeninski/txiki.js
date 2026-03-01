@@ -1,0 +1,27 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: true
+    - uses: actions/setup-node@v6
+      with:
+        node-version-file: '.nvmrc'
+    - name: Build
+      run: |
+        npm install
+        npm run docs
+    - name: Deploy
+      run: |
+         git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+         npm run docs:deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
